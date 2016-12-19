@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+
+<head>
+
+</head>
+<body style="background-color: white">
+
+<div class="controllers" style="">
+    <button id="changeColor" style="background-color: black; color: white"
+            onclick="changeBackground()">Night Mode</button>
+    <button id="displayDate" style="background-color: black; color: white"
+            onclick="getDate()">Display Date</button>
+    <p id="textArea"></p>
+</div>
+<script>
+
+function changeBackground() {
+	var bodyStyle = document.getElementsByTagName("body");
+    var buttons = document.getElementsByTagName("button");
+    var paragraphs = document.getElementsByTagName("p");
+	if(bodyStyle[0].style.backgroundColor == "white") {
+        changeElementsStyles("white", "black", bodyStyle);
+        changeElementsStyles("white", "black", buttons);
+        changeElementsStyles("white", "black", paragraphs);
+	}
+	else {
+        changeElementsStyles("black", "white", bodyStyle);
+        changeElementsStyles("black", "white", buttons);
+        changeElementsStyles("black", "white", paragraphs);
+        changeElementsStyles("black", "white", paragraphs);
+	}
+	
+}
+
+function changeElementsStyles(first, second, elements) {
+    var i = 0, elementsNum = elements.length;
+
+    for(i = 0; i < elementsNum; i++) {
+        if(elements[i].nodeName == "BODY") {
+            elements[i].style.backgroundColor = second;
+        }
+        else if(elements[i].nodeName == "P") {
+            elements[i].style.color = first;
+        }
+        else {
+            elements[i].style.backgroundColor = first;
+            elements[i].style.color = second;
+            if(elements[i].id == "changeColor")
+                elements[i].innerHTML = elements[i].innerHTML == "Day Mode" ?
+                        "Night Mode" : "Day Mode";
+        }
+    }
+}
+
+function getDate() {
+    var request = new XMLHttpRequest();
+    request.open("GET", "../rest/time/", true);
+    request.setRequestHeader("Content-type", "application/json");
+    request.onreadystatechange = function() {
+        document.getElementById("textArea").innerHTML = parseResponse(request.responseText);
+    }
+    request.send();
+}
+
+function parseResponse(jsonResponse) {
+    console.log(jsonResponse);
+    var response = JSON.parse(jsonResponse);
+    return pad(response.day) + "/" + pad(1 + response.month) + "/" + response.year + "T" +
+                    pad(response.hour) + ":" + pad(response.minute) + ":" + pad(response.second);
+}
+
+function pad(number) {
+    var res = number;
+    if(number < 10) {
+        res = "0" + number;
+    }
+    return res;
+}
+/*
+function getYesterday() {
+	var today = new Date();
+	var now = today.getTime();
+	var yesterday = new Date(now - (24*60*60*1000));
+	document.getElementById("textArea").innerHTML = yesterday.getDate() + "/" + (yesterday.getMonth() + 1) + "/" + yesterday.getFullYear();
+}
+*/
+
+/*function Person(name, age, gender) {
+	this.name = name;
+	this.age = age;
+	this.gender = gender;
+	
+	return this;
+}
+
+function Employee(id) {
+	this.id = id;
+	
+	return this;
+}
+
+var p = new Person("Amin", 26, "Male");
+var e = new Employee(21638564);
+e.__proto__ = p;
+
+console.log(e.name);*/
+</script>
+</body>
+</html>
