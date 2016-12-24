@@ -1,109 +1,177 @@
 <!DOCTYPE html>
 
 <head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <style>
+        div.control_panel {
+            position: relative;
+            top: 150px;
+            margin: auto;
+            width: 320px;
+            height: 250px;
+            border: 5px double green;
+        }
+        div.controllers {
+            position: relative;
+            top: 5px;
+            width: 320px;
+            height: 100px;
+            border: 1px solid green;
+        }
+        button {
+            position: relative;
+            padding: 10px 10px 10px 10px;
+            background-color: black;
+            margin-left: 27px;
+            color: white;
+        }
+        div.checkbox {
+            margin-top: 5px;
+            width: 320px;
+            height: 40px;
+        }
+        .auto {
+            margin-top: 10px;
+        }
+        h3 {
+            position: relative;
+            text-align: center;
+            color: green;
+        }
+        p {
+            position: relative;
+            text-align: center;
+            bottom: 5px;
+            font-size: 25px;
+            font-family: arial, helvetica, verdana, sans-serif;
+        }
+    </style>
 
 </head>
 <body style="background-color: white">
 
-<div class="controllers" style="">
-    <button id="changeColor" style="background-color: black; color: white"
-            onclick="changeBackground()">Night Mode</button>
-    <button id="displayDate" style="background-color: black; color: white"
-            onclick="getDate()">Display Date</button>
+<div class="control_panel">
+    <h3>Control Panel</h3>
+
+    <div class="controllers">
+        <button id="changeColor" onclick="changeBackground()">
+            <i class="fa fa-moon-o"></i> Night Mode</button>
+
+        <button id="displayDate" onclick="getDate()"><i class="fa fa-calendar">
+        </i> Display Date</button>
+        
+        <div class="checkbox">
+            <input class="auto" type="checkbox" id="auto_timer" style="margin-left: 30px">
+
+            <label class="auto" for="auto_timer">Check to enable automatic timer
+                <i class="fa fa-clock-o" style="color: green"></i></label>
+        </div>
+    </div>
     <p id="textArea"></p>
 </div>
 <script>
+    var checkbox = document.getElementById("auto_timer");
+    if(checkbox.checked) {
+        setInterval(getDate(), 1000);
+    }
 
-function changeBackground() {
-	var bodyStyle = document.getElementsByTagName("body");
-    var buttons = document.getElementsByTagName("button");
-    var paragraphs = document.getElementsByTagName("p");
-	if(bodyStyle[0].style.backgroundColor == "white") {
-        changeElementsStyles("white", "black", bodyStyle);
-        changeElementsStyles("white", "black", buttons);
-        changeElementsStyles("white", "black", paragraphs);
-	}
-	else {
-        changeElementsStyles("black", "white", bodyStyle);
-        changeElementsStyles("black", "white", buttons);
-        changeElementsStyles("black", "white", paragraphs);
-        changeElementsStyles("black", "white", paragraphs);
-	}
-	
-}
-
-function changeElementsStyles(first, second, elements) {
-    var i = 0, elementsNum = elements.length;
-
-    for(i = 0; i < elementsNum; i++) {
-        if(elements[i].nodeName == "BODY") {
-            elements[i].style.backgroundColor = second;
-        }
-        else if(elements[i].nodeName == "P") {
-            elements[i].style.color = first;
+    function changeBackground() {
+        var bodyStyle = document.getElementsByTagName("body");
+        var buttons = document.getElementsByTagName("button");
+        var paragraphs = document.getElementsByTagName("p");
+        var inputs = document.getElementsByTagName("label");
+        if(bodyStyle[0].style.backgroundColor == "white") {
+            changeElementsStyles("white", "black", bodyStyle);
+            changeElementsStyles("white", "black", buttons);
+            changeElementsStyles("white", "black", paragraphs);
+            changeElementsStyles("white", "black", inputs);
         }
         else {
-            elements[i].style.backgroundColor = first;
-            elements[i].style.color = second;
-            if(elements[i].id == "changeColor")
-                elements[i].innerHTML = elements[i].innerHTML == "Day Mode" ?
-                        "Night Mode" : "Day Mode";
+            changeElementsStyles("black", "white", bodyStyle);
+            changeElementsStyles("black", "white", buttons);
+            changeElementsStyles("black", "white", paragraphs);
+            changeElementsStyles("black", "white", paragraphs);
+            changeElementsStyles("black", "white", inputs);
+        }
+
+    }
+
+    function changeElementsStyles(first, second, elements) {
+        var i = 0, elementsNum = elements.length;
+
+        for(i = 0; i < elementsNum; i++) {
+            if(elements[i].nodeName == "BODY") {
+                elements[i].style.backgroundColor = second;
+            }
+            else if(elements[i].nodeName == "P") {
+                elements[i].style.color = first;
+            }
+            else if(elements[i].nodeName == "LABEL") {
+                elements[i].style.color = first;
+            }
+            else { //buttons
+                elements[i].style.backgroundColor = first;
+                elements[i].style.color = second;
+                if(elements[i].id == "changeColor")
+                    elements[i].innerHTML = elements[i].innerHTML == "<i class=\"fa fa-sun-o\"></i> Day Mode" ?
+                            "<i class=\"fa fa-moon-o\"></i> Night Mode" : "<i class=\"fa fa-sun-o\"></i> Day Mode";
+            }
         }
     }
-}
 
-function getDate() {
-    var request = new XMLHttpRequest();
-    request.open("GET", "../rest/time/", true);
-    request.setRequestHeader("Content-type", "application/json");
-    request.onreadystatechange = function() {
-        document.getElementById("textArea").innerHTML = parseResponse(request.responseText);
+    function getDate() {
+        var request = new XMLHttpRequest();
+        request.open("GET", "../rest/time/", true);
+        request.setRequestHeader("Content-type", "application/json");
+        request.onreadystatechange = function() {
+            document.getElementById("textArea").innerHTML = "The time is:<br>" +
+            parseResponse(request.responseText);
+        }
+        request.send();
     }
-    request.send();
-}
 
-function parseResponse(jsonResponse) {
-    console.log(jsonResponse);
-    var response = JSON.parse(jsonResponse);
-    return pad(response.day) + "/" + pad(1 + response.month) + "/" + response.year + "T" +
-                    pad(response.hour) + ":" + pad(response.minute) + ":" + pad(response.second);
-}
-
-function pad(number) {
-    var res = number;
-    if(number < 10) {
-        res = "0" + number;
+    function parseResponse(jsonResponse) {
+        console.log(jsonResponse);
+        var response = JSON.parse(jsonResponse);
+        return pad(response.day) + "/" + pad(1 + response.month) + "/" + response.year + "T" +
+                pad(response.hour) + ":" + pad(response.minute) + ":" + pad(response.second);
     }
-    return res;
-}
-/*
-function getYesterday() {
-	var today = new Date();
-	var now = today.getTime();
-	var yesterday = new Date(now - (24*60*60*1000));
-	document.getElementById("textArea").innerHTML = yesterday.getDate() + "/" + (yesterday.getMonth() + 1) + "/" + yesterday.getFullYear();
-}
-*/
 
-/*function Person(name, age, gender) {
-	this.name = name;
-	this.age = age;
-	this.gender = gender;
-	
-	return this;
-}
+    function pad(number) {
+        var res = number;
+        if(number < 10) {
+            res = "0" + number;
+        }
+        return res;
+    }
+    /*
+     function getYesterday() {
+     var today = new Date();
+     var now = today.getTime();
+     var yesterday = new Date(now - (24*60*60*1000));
+     document.getElementById("textArea").innerHTML = yesterday.getDate() + "/" + (yesterday.getMonth() + 1) + "/" + yesterday.getFullYear();
+     }
+     */
 
-function Employee(id) {
-	this.id = id;
-	
-	return this;
-}
+    /*function Person(name, age, gender) {
+     this.name = name;
+     this.age = age;
+     this.gender = gender;
 
-var p = new Person("Amin", 26, "Male");
-var e = new Employee(21638564);
-e.__proto__ = p;
+     return this;
+     }
 
-console.log(e.name);*/
+     function Employee(id) {
+     this.id = id;
+
+     return this;
+     }
+
+     var p = new Person("Amin", 26, "Male");
+     var e = new Employee(21638564);
+     e.__proto__ = p;
+
+     console.log(e.name);*/
 </script>
 </body>
 </html>

@@ -17,7 +17,7 @@ public class TimeDisplay {
         res.append("{\"day\" : ").append(c.get(Calendar.DAY_OF_MONTH)).append(", ").
                 append("\"month\" : ").append(c.get(Calendar.MONTH)).append(", ").
                 append("\"year\" : ").append(c.get(Calendar.YEAR)).append(", ").
-                append("\"hour\" : ").append(c.get(Calendar.HOUR)).append(", ").
+                append("\"hour\" : ").append(c.get(Calendar.HOUR_OF_DAY)).append(", ").
                 append("\"minute\" : ").append(c.get(Calendar.MINUTE)).append(", ").
                 append("\"second\" : ").append(c.get(Calendar.SECOND)).append("}");
         return res.toString();
